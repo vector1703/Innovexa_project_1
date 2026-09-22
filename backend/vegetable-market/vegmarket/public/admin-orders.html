@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Admin Orders</title>
+
+<link
+    rel="stylesheet"
+    href="/css/style.css"
+>
+
+</head>
+
+<body>
+
+
+<header class="admin-header">
+
+    <div class="logo">
+        🥕 Admin Orders
+    </div>
+
+
+    <nav>
+
+        <a href="/admin">
+            Dashboard
+        </a>
+
+        <a href="/admin/products">
+            Products
+        </a>
+
+    </nav>
+
+</header>
+
+
+<main class="section">
+
+
+    <h1>
+        📦 Pending Orders
+    </h1>
+
+
+    <div id="ordersContainer">
+
+        Loading orders...
+
+    </div>
+
+
+    <p id="message"></p>
+
+
+</main>
+
+
+<script>
+
+async function loadOrders() {
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/admin/orders"
+            );
+
+
+        if (
+            response.status === 401
+        ) {
+
+            window.location.href =
+                "/admin-login.html";
+
+            return;
+        }
+
+
+        const data =
+            await response.json();
+
+
+        const container =
+            document.getElementById(
+                "ordersContainer"
+            );
+
+
+        if (
+            !data.orders ||
+            data.orders.length === 0
+        ) {
+
+            container.innerHTML = `
+
+                <div class="empty">
+
+                    <h2>
+                        No pending orders
+                    </h2>
+
+                    <p>
+                        New customer orders
+                        will appear here.
+                    </p>
+
+                </div>
+
+            `;
+
+            return;
+        }
+
+
+        container.innerHTML = "";
+
+
+        data.orders.forEach(
+            order => {
+
+                let itemsHTML = "";
+
+
+                order.items.forEach(
+                    item => {
+
+                        itemsHTML += `
+
+                            <li>
+
+                                ${item.product_name}
+
+                                ×
+                                ${item.quantity}
+
+                                =
+                                ₹${(
+                                    Number(item.price) *
+                                    Number(item.quantity)
+                                ).toFixed(2)}
+
+                            </li>
+
+                        `;
+                    }
+                );
+
+
+                const card =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                card.className =
+                    "order-card";
+
+
+                card.innerHTML = `
+
+                    <div class="order-header">
+
+                        <h2>
+                            Order #${order.id}
+                        </h2>
+
+                        <span class="pending">
+                            PENDING
+                        </span>
+
+                    </div>
+
+
+                    <p>
+                        <strong>
+                            Customer:
+                        </strong>
+
+                        ${order.customer_name}
+                    </p>
+
+
+                    <p>
+                        <strong>
+                            Phone:
+                        </strong>
+
+                        ${order.phone}
+                    </p>
+
+
+                    <p>
+                        <strong>
+                            Store:
+                        </strong>
+
+                        ${order.store_name}
+                    </p>
+
+
+                    <h3>
+                        Vegetables
+                    </h3>
+
+
+                    <ul>
+                        ${itemsHTML}
+                    </ul>
+
+
+                    <h2>
+                        Total:
+                        ₹${Number(
+                            order.total_amount
+                        ).toFixed(2)}
+                    </h2>
+
+
+                    <button
+                        class="primary-btn"
+                        onclick="
+                            completeOrder(
+                                ${order.id}
+                            )
+                        "
+                    >
+                        ✓ Complete Order
+                    </button>
+
+                `;
+
+
+                container.appendChild(
+                    card
+                );
+            }
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        document.getElementById(
+            "ordersContainer"
+        ).textContent =
+            "Server error";
+    }
+}
+
+
+// ==========================================
+// COMPLETE
+// ==========================================
+
+async function completeOrder(
+    orderId
+) {
+
+    const response =
+        await fetch(
+
+            `/api/admin/orders/${orderId}/complete`,
+
+            {
+                method: "POST"
+            }
+        );
+
+
+    const data =
+        await response.json();
+
+
+    const message =
+        document.getElementById(
+            "message"
+        );
+
+
+    message.textContent =
+        data.message;
+
+
+    message.className =
+        data.success
+            ? "success"
+            : "error";
+
+
+    if (data.success) {
+
+        loadOrders();
+    }
+}
+
+
+loadOrders();
+
+</script>
+
+</body>
+
+</html>
