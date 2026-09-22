@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>VegMarket Login</title>
+
+<link
+    rel="stylesheet"
+    href="/css/style.css"
+>
+
+</head>
+
+<body class="auth-body">
+
+
+<div class="auth-card">
+
+
+    <h1>
+        🥦 VegMarket
+    </h1>
+
+    <p>
+        Customer Account
+    </p>
+
+
+    <div class="tabs">
+
+        <button
+            id="loginTab"
+            class="tab active"
+        >
+            Login
+        </button>
+
+        <button
+            id="registerTab"
+            class="tab"
+        >
+            Register
+        </button>
+
+    </div>
+
+
+    <!-- LOGIN -->
+
+    <form id="loginForm">
+
+        <label>
+            Email
+        </label>
+
+        <input
+            type="email"
+            id="loginEmail"
+            required
+        >
+
+
+        <label>
+            Password
+        </label>
+
+        <input
+            type="password"
+            id="loginPassword"
+            required
+        >
+
+
+        <button
+            type="submit"
+            class="primary-btn full"
+        >
+            Login
+        </button>
+
+    </form>
+
+
+    <!-- REGISTER -->
+
+    <form
+        id="registerForm"
+        class="hidden"
+    >
+
+        <label>
+            Name
+        </label>
+
+        <input
+            type="text"
+            id="regName"
+            required
+        >
+
+
+        <label>
+            Email
+        </label>
+
+        <input
+            type="email"
+            id="regEmail"
+            required
+        >
+
+
+        <label>
+            Password
+        </label>
+
+        <input
+            type="password"
+            id="regPassword"
+            minlength="6"
+            required
+        >
+
+
+        <button
+            type="submit"
+            class="primary-btn full"
+        >
+            Create Account
+        </button>
+
+    </form>
+
+
+    <p id="message"></p>
+
+
+    <a href="/" class="back-link">
+        ← Home
+    </a>
+
+</div>
+
+
+<script src="/js/auth.js"></script>
+
+</body>
+
+</html>
