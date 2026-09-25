@@ -1,0 +1,8 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bloom & Belle · Innovexa Fashion</title><link rel="stylesheet" href="css/style.css"></head><body>
+<header class="nav"><a class="brand" href="index.html">Bloom & Belle</a><nav class="navlinks"><a href="index.html">Home</a><a href="products.html">Shop</a><a href="cart.html">Cart (<span id="cartCount">0</span>)</a><span id="authArea"></span></nav></header>
+<section class="hero"><div class="container"><h1>Style that feels like you.</h1><p>Discover elegant everyday fashion, statement pieces and accessories for every occasion.</p><a class="btn" href="products.html">Shop Collection</a></div></section>
+<section class="section container"><h2>Featured Collection</h2><div id="featured" class="grid"></div></section>
+<footer class="footer">© 2026 Innovexa · Women's Fashion Store</footer>
+<script src="js/api.js"></script><script src="js/common.js"></script><script>
+(async()=>{try{const p=await api("/products");document.querySelector("#featured").innerHTML=p.slice(0,4).map(x=>`<article class="card"><a href="product.html?id=${x.id}"><img src="${esc(x.image)}"><div class="cardbody"><h3>${esc(x.name)}</h3><p class="price">${money(x.price)}</p><p class="muted">${esc(x.category)}</p></div></a></article>`).join("")}catch(e){document.querySelector("#featured").innerHTML="<p>Unable to load products.</p>"}})();
+</script></body></html>
