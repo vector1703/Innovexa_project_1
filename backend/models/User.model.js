@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 /**
  * Address sub-schema for customer address book.
@@ -26,18 +27,22 @@ const userSchema = new mongoose.Schema(
     name: {
       type: String,
       required: [true, 'User name is required'],
-      trim: true
+      trim: true,
+      maxlength: [50, 'Name cannot exceed 50 characters']
     },
     email: {
       type: String,
       required: [true, 'Email is required'],
       unique: true,
       lowercase: true,
-      trim: true
+      trim: true,
+      match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email address']
     },
     password: {
       type: String,
-      default: ''
+      default: '',
+      minlength: [6, 'Password must be at least 6 characters'],
+      select: false // never returned by queries unless explicitly requested
     },
     phone: {
       type: String,
@@ -55,5 +60,18 @@ const userSchema = new mongoose.Schema(
     timestamps: true
   }
 );
+
+// Hash the password before saving whenever it is new or modified
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password') || !this.password) return next();
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
+});
+
+// Instance method to compare a plain-text password with the stored hash
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  return bcrypt.compare(enteredPassword, this.password);
+};
 
 module.exports = mongoose.model('User', userSchema);

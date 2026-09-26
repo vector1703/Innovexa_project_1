@@ -65,7 +65,7 @@ const register = async (req, res) => {
  */
 const login = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, password } = req.body;
 
     if (!email) {
       return res.status(400).json({
@@ -74,14 +74,23 @@ const login = async (req, res) => {
       });
     }
 
-    let user = await User.findOne({ email: email.toLowerCase() });
+    let user = await User.findOne({ email: email.toLowerCase() }).select('+password');
     if (!user) {
       // Auto-create test customer if logging in for demo simplicity
       user = await User.create({
         name: email.split('@')[0],
         email: email.toLowerCase(),
+        password: password || 'default_password_123',
         role: 'customer'
       });
+    } else if (password && user.matchPassword) {
+      const isMatch = await user.matchPassword(password);
+      if (!isMatch) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid credentials'
+        });
+      }
     }
 
     const token = generateToken(user._id, user.email, user.role);
