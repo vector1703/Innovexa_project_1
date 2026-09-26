@@ -1,12 +1,3 @@
-const router = require("express").Router();
-const c = require("../controllers/cartController");
-const { auth } = require("../middleware/auth");
-router.use(auth);
-router.get("/", c.getCart);
-router.post("/", c.addToCart);
-router.put("/:id", c.updateQty);
-router.delete("/:id", c.removeItem);
-router.delete("/", c.clearCart);
 const express = require('express');
 const router = express.Router();
 const {
