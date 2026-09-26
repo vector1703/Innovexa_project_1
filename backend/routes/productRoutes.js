@@ -1,4 +1,5 @@
 const express = require("express");
+const express = require('express');
 const router = express.Router();
 const {
   getProducts,
@@ -38,5 +39,11 @@ router.put("/:id", auth, admin, updateProduct);
 // @desc    Delete a fashion product
 // @access  Protected (Admin only)
 router.delete("/:id", auth, admin, deleteProduct);
+  seedProducts
+} = require('../controllers/productController');
+
+router.get('/', getProducts);
+router.get('/:id', getProductById);
+router.post('/seed', seedProducts);
 
 module.exports = router;

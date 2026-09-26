@@ -10,6 +10,26 @@ const PORT = process.env.PORT || 5000;
 // Connect to MongoDB
 connectMongoDB();
 
+const express = require('express');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const mongoose = require('mongoose');
+
+// Load environment variables
+dotenv.config();
+
+// Database connection
+const connectDB = require('./config/db');
+
+// Route Aggregator
+const apiRoutes = require('./routes');
+
+// Middleware
+const { notFound, errorHandler } = require('./middleware/errorMiddleware');
+
+const app = express();
+
+// Core Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -34,3 +54,48 @@ app.get("*", (req, res) => {
 app.listen(PORT, () =>
   console.log(`Innovexa Project 1 running at http://localhost:${PORT}`)
 );
+// Health Check Endpoint
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+    service: "Innovexa Women's Fashion Store API",
+    mongoConnection: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+  });
+});
+
+// API Routes Mounted under /api
+app.use('/api', apiRoutes);
+
+// Root Welcome Endpoint
+app.get('/', (req, res) => {
+  res.status(200).json({
+    message: "Welcome to Innovexa Women's Fashion Store API",
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      products: '/api/products',
+      cart: '/api/cart',
+      orders: '/api/orders',
+      payments: '/api/payments'
+    }
+  });
+});
+
+// 404 & Centralized Error Handlers
+app.use(notFound);
+app.use(errorHandler);
+
+const PORT = process.env.PORT || 5000;
+
+if (process.env.NODE_ENV !== 'test') {
+  connectDB();
+  app.listen(PORT, () => {
+    console.log(`[Server] Women's Fashion Store API listening on port ${PORT}`);
+    console.log(`[Server] Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
+}
+
+module.exports = app;
