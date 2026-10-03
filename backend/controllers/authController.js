@@ -11,10 +11,17 @@ const register = async (req, res) => {
   try {
     const { name, email, password, phone } = req.body;
 
-    if (!name || !email) {
+    if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Name and email are required'
+        message: 'Name, email, and password are required'
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters'
       });
     }
 
@@ -29,7 +36,7 @@ const register = async (req, res) => {
     const user = await User.create({
       name,
       email: email.toLowerCase(),
-      password: password || 'default_password_123',
+      password,
       phone: phone || '',
       role: 'customer'
     });

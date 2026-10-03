@@ -1,132 +1,17 @@
-const mongoose = require("mongoose");
-
-/**
- * Mongoose Schema for Women's Fashion Products
- */
-const productSchema = new mongoose.Schema(
-  {
-    title: {
-      type: String,
-      required: [true, "Product title is required"],
-      trim: true,
-      maxlength: [150, "Product title cannot exceed 150 characters"],
-    },
-    description: {
-      type: String,
-      required: [true, "Product description is required"],
-      trim: true,
-    },
-    price: {
-      type: Number,
-      required: [true, "Product price is required"],
-      min: [0, "Product price cannot be negative"],
-    },
-    category: {
-      type: String,
-      required: [true, "Product category is required"],
-      trim: true,
-      lowercase: true,
-      enum: {
-        values: [
-          "dresses",
-          "tops",
-          "outerwear",
-          "bottoms",
-          "knitwear",
-          "activewear",
-          "accessories",
-        ],
-        message: "{VALUE} is not a supported fashion category",
-      },
-      index: true,
-    },
-    sizes: {
-      type: [String],
-      required: [true, "At least one size must be specified"],
-      validate: {
-        validator: function (v) {
-          return Array.isArray(v) && v.length > 0;
-        },
-        message: "Sizes must be a non-empty array of strings (e.g., ['XS', 'S', 'M', 'L', 'XL'])",
-      },
-    },
-    colors: {
-      type: [String],
-      required: [true, "At least one color must be specified"],
-      validate: {
-        validator: function (v) {
-          return Array.isArray(v) && v.length > 0;
-        },
-        message: "Colors must be a non-empty array of strings",
-      },
-    },
-    stockQuantity: {
-      type: Number,
-      required: [true, "Stock quantity is required"],
-      min: [0, "Stock quantity cannot be negative"],
-      default: 0,
-    },
-    imageUrls: {
-      type: [String],
-      required: [true, "At least one product image URL is required"],
-      validate: {
-        validator: function (v) {
-          return Array.isArray(v) && v.length > 0;
-        },
-        message: "imageUrls must contain at least one valid image URL",
-      },
-    },
-  },
-  {
-    timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
-  }
-);
-
-// Virtual: inStock helper
-productSchema.virtual("inStock").get(function () {
-  return this.stockQuantity > 0;
-});
-
-// UI compatibility virtuals
-productSchema
-  .virtual("stock")
-  .get(function () {
-    return this.stockQuantity;
-  })
-  .set(function (value) {
-    this.stockQuantity = value;
-  });
-
-productSchema.virtual("name").get(function () {
-  return this.title;
-});
-
-productSchema.virtual("image").get(function () {
-  return this.imageUrls && this.imageUrls.length > 0 ? this.imageUrls[0] : "";
-});
-
-// Compound index for category and price
-productSchema.index({ category: 1, price: 1 });
-// Full-text search index across title and description
-productSchema.index({ title: "text", description: "text" });
-
-const Product = mongoose.models.Product || mongoose.model("Product", productSchema);
-
-module.exports = Product;
 const mongoose = require('mongoose');
 
 /**
  * Product Schema tailored for Women's Fashion Store.
- * Supports apparel categories, size ranges (XS, S, M, L, XL), colors, and stock.
+ * Supports apparel categories, size ranges (XS–XL), colors, stock tracking,
+ * and availability flag.
  */
 const productSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: [true, 'Product name is required'],
-      trim: true
+      trim: true,
+      maxlength: [150, 'Product name cannot exceed 150 characters']
     },
     description: {
       type: String,
@@ -141,15 +26,38 @@ const productSchema = new mongoose.Schema(
     category: {
       type: String,
       required: [true, 'Category is required'],
-      enum: ['Dresses', 'Tops & Blouses', 'Skirts', 'Pants & Trousers', 'Ethnic Wear', 'Outerwear', 'Accessories'],
-      default: 'Dresses'
+      trim: true,
+      lowercase: true,
+      enum: {
+        values: [
+          'dresses',
+          'tops & blouses',
+          'skirts',
+          'pants & trousers',
+          'ethnic wear',
+          'outerwear',
+          'knitwear',
+          'activewear',
+          'accessories'
+        ],
+        message: "'{VALUE}' is not a supported fashion category"
+      },
+      index: true
     },
     sizes: {
       type: [String],
+      validate: {
+        validator: (v) => Array.isArray(v) && v.length > 0,
+        message: "Sizes must be a non-empty array (e.g., ['XS', 'S', 'M', 'L', 'XL'])"
+      },
       default: ['XS', 'S', 'M', 'L', 'XL']
     },
     colors: {
       type: [String],
+      validate: {
+        validator: (v) => Array.isArray(v) && v.length > 0,
+        message: 'Colors must be a non-empty array of strings'
+      },
       default: ['Black', 'White', 'Blush Pink', 'Emerald']
     },
     images: {
@@ -160,7 +68,7 @@ const productSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'Stock count is required'],
       min: [0, 'Stock cannot be negative'],
-      default: 20
+      default: 0
     },
     isAvailable: {
       type: Boolean,
@@ -168,8 +76,24 @@ const productSchema = new mongoose.Schema(
     }
   },
   {
-    timestamps: true
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
   }
 );
 
-module.exports = mongoose.model('Product', productSchema);
+// Virtual: convenience boolean for in-stock check
+productSchema.virtual('inStock').get(function () {
+  return this.stock > 0;
+});
+
+// Compound index for category + price queries
+productSchema.index({ category: 1, price: 1 });
+
+// Full-text search index across name and description
+productSchema.index({ name: 'text', description: 'text' });
+
+// Guard against model re-registration during hot-reload (nodemon)
+const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
+
+module.exports = Product;
