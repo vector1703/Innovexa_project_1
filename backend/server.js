@@ -54,8 +54,8 @@ app.get('/', (req, res) => {
   });
 });
 
-// Catch-all for unmatched frontend routes
-app.get('*', (req, res) => {
+// Catch-all for unmatched frontend routes (Express 5 requires named wildcard)
+app.get('/*path', (req, res) => {
   if (req.path.startsWith('/api/'))
     return res.status(404).json({ message: 'API route not found' });
   res.sendFile(path.join(__dirname, '../frontend/index.html'));

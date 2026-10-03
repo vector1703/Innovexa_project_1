@@ -1,28 +1,13 @@
 {
   "name": "innovexa_project_1",
   "version": "1.0.0",
-  "description": "Innovexa Project 1 - Women's Fashion Catalog and E-Commerce Platform",
+  "description": "Innovexa Women's Fashion Store E-Commerce Platform",
   "main": "backend/server.js",
-  "scripts": {
-    "start": "node backend/server.js",
-    "dev": "node --watch backend/server.js",
-    "seed": "node backend/scripts/seed.js"
-  },
-  "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.2",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.8.4",
-    "mysql2": "^3.11.5"
-  "name": "innovexa",
-  "version": "1.0.0",
-  "description": "Women's Fashion Store E-Commerce Backend API",
-  "main": "backend/server.js",
+  "type": "commonjs",
   "scripts": {
     "start": "node backend/server.js",
     "dev": "nodemon backend/server.js",
+    "seed": "node backend/scripts/seed.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -32,17 +17,18 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/vector1703/Innovexa_project_1/issues"
   },
   "homepage": "https://github.com/vector1703/Innovexa_project_1#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.6",
     "dotenv": "^18.0.4",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.10.2"
+    "mongoose": "^9.10.2",
+    "mysql2": "^3.11.5"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
